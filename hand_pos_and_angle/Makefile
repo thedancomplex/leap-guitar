@@ -1,6 +1,6 @@
 OS := $(shell uname)
 ARCH := $(shell uname -m)
-SYS_NAME=hand_roll_pitch_yaw
+SYS_NAME=hand_pos_and_angle
 
 
 ifeq ($(OS), Linux)
