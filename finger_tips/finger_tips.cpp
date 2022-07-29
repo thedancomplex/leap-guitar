@@ -98,15 +98,19 @@ void SampleListener::onFrame(const Controller& controller) {
         Bone::Type boneType = static_cast<Bone::Type>(b);
         Bone bone = finger.bone(boneType);
 	if ( 
+	    /* Gets the middle finger */
 	    (boneNames[boneType].compare("Middle") == 0) 
 	    & 
-	    (true)) {
+
+	    /* Gets the end of finger */
+	    (finger.type() == 4)) {  
 
 
 	std::cout << std::string(6, ' ') <<  boneNames[boneType]
-                  << " - " << b << " - "
-		  << " - " << boneType << " - "
+                  << " - "     << b                << " - "
+		  << " - "     << boneType         << " - "
                   << ", end: " << bone.nextJoint()
+                  << ", end: " << finger.type()
                   << std::endl;
 /*
 	std::cout << std::string(6, ' ') <<  boneNames[boneType]
