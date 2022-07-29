@@ -70,7 +70,7 @@ void SampleListener::onFrame(const Controller& controller) {
     std::cout << std::string(2, ' ') <<  "pitch: " << direction.pitch() * RAD_TO_DEG << " degrees, "
               << "roll: " << normal.roll() * RAD_TO_DEG << " degrees, "
               << "yaw: " << direction.yaw() * RAD_TO_DEG << " degrees" << std::endl;
-
+/*
     // Get the Arm bone
     Arm arm = hand.arm();
     std::cout << std::string(2, ' ') <<  "Arm direction: " << arm.direction()
@@ -95,9 +95,12 @@ void SampleListener::onFrame(const Controller& controller) {
                   << ", end: " << bone.nextJoint()
                   << ", direction: " << bone.direction() << std::endl;
       }
+*/
     }
   }
 
+
+/*
   // Get tools
   const ToolList tools = frame.tools();
   for (ToolList::const_iterator tl = tools.begin(); tl != tools.end(); ++tl) {
@@ -174,12 +177,12 @@ void SampleListener::onFrame(const Controller& controller) {
         break;
     }
   }
-
   if (!frame.hands().isEmpty() || !gestures.isEmpty()) {
     std::cout << std::endl;
   }
 
 }
+*/
 
 void SampleListener::onFocusGained(const Controller& controller) {
   std::cout << "Focus Gained" << std::endl;

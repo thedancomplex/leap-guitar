@@ -1,5 +1,7 @@
 OS := $(shell uname)
 ARCH := $(shell uname -m)
+SYS_NAME=finger_tips
+
 
 ifeq ($(OS), Linux)
   ifeq ($(ARCH), x86_64)
@@ -12,11 +14,11 @@ else
   LEAP_LIBRARY := ../lib/libLeap.dylib
 endif
 
-finger_tips: finger_tips.cpp
-	$(CXX) -Wall -g -I../include finger_tips.cpp -o finger_tips $(LEAP_LIBRARY)
+$(SYS_NAME): $(SYS_NAME).cpp
+	$(CXX) -Wall -g -I../include $(SYS_NAME).cpp -o $(SYS_NAME) $(LEAP_LIBRARY)
 ifeq ($(OS), Darwin)
 	install_name_tool -change @loader_path/libLeap.dylib ../lib/libLeap.dylib Sample
 endif
 
 clean:
-	rm -rf Sample Sample.dSYM
+	rm -rf $(SYS_NAME) $(SYS_NAME).dSYM
