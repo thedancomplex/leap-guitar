@@ -83,9 +83,16 @@ void SampleListener::onFrame(const Controller& controller) {
 
 */
     // Get fingers
-    double xyz_index[] = {0.0, 0.0, 0.0};
-    double xyz_thumb[] = {0.0, 0.0, 0.0};
-    double tip_dist = 0.0;
+    double xyz_index[]  = {0.0, 0.0, 0.0};
+    double xyz_middle[] = {0.0, 0.0, 0.0};
+    double xyz_ring[]   = {0.0, 0.0, 0.0};
+    double xyz_pinky[]  = {0.0, 0.0, 0.0};
+    double xyz_thumb[]  = {0.0, 0.0, 0.0};
+    double tip_dist_thumb_index  = 0.0;
+    double tip_dist_thumb_middle = 0.0;
+    double tip_dist_thumb_ring   = 0.0;
+    double tip_dist_thumb_pinky  = 0.0;
+//const std::string fingerNames[] = {"Thumb", "Index", "Middle", "Ring", "Pinky"};
     const FingerList fingers = hand.fingers();
     for (FingerList::const_iterator fl = fingers.begin(); fl != fingers.end(); ++fl) {
       const Finger finger = *fl;
@@ -106,6 +113,34 @@ void SampleListener::onFrame(const Controller& controller) {
 	   ) {
 
             if (
+	    /* Gets the pinky finger */
+	    (fingerNames[finger.type()].compare("Pinky") == 0)
+	    ) {  
+            xyz_pinky[0] = bone.nextJoint()[0];
+            xyz_pinky[1] = bone.nextJoint()[1];
+            xyz_pinky[2] = bone.nextJoint()[2];
+	    }
+
+            if (
+	    /* Gets the ring finger */
+	    (fingerNames[finger.type()].compare("Ring") == 0)
+	    ) {  
+            xyz_ring[0] = bone.nextJoint()[0];
+            xyz_ring[1] = bone.nextJoint()[1];
+            xyz_ring[2] = bone.nextJoint()[2];
+	    }
+
+
+            if (
+	    /* Gets the middle finger */
+	    (fingerNames[finger.type()].compare("Middle") == 0)
+	    ) {  
+            xyz_middle[0] = bone.nextJoint()[0];
+            xyz_middle[1] = bone.nextJoint()[1];
+            xyz_middle[2] = bone.nextJoint()[2];
+	    }
+
+            if (
 	    /* Gets the index finger */
 	    (fingerNames[finger.type()].compare("Index") == 0)
 	    ) {  
@@ -123,16 +158,24 @@ void SampleListener::onFrame(const Controller& controller) {
 	    }
 	}
 
-	for (int i = 0; i < 3; i++)
-	{
-		tip_dist += (xyz_index[i] - xyz_thumb[i]) * (xyz_index[i] - xyz_thumb[i]);
-	}
-
-	tip_dist = sqrt(tip_dist);
 
       }
     }
-    std::cout << tip_dist << std::endl;
+	for (int i = 0; i < 3; i++) tip_dist_thumb_index  += (xyz_index[i]  - xyz_thumb[i]) * (xyz_index[i]  - xyz_thumb[i]);
+	for (int i = 0; i < 3; i++) tip_dist_thumb_middle += (xyz_middle[i] - xyz_thumb[i]) * (xyz_middle[i] - xyz_thumb[i]);
+	for (int i = 0; i < 3; i++) tip_dist_thumb_ring   += (xyz_ring[i]   - xyz_thumb[i]) * (xyz_ring[i]   - xyz_thumb[i]);
+	for (int i = 0; i < 3; i++) tip_dist_thumb_pinky  += (xyz_pinky[i]  - xyz_thumb[i]) * (xyz_pinky[i]  - xyz_thumb[i]);
+
+
+	tip_dist_thumb_index  = sqrt(tip_dist_thumb_index);
+	tip_dist_thumb_middle = sqrt(tip_dist_thumb_middle);
+	tip_dist_thumb_ring   = sqrt(tip_dist_thumb_ring);
+	tip_dist_thumb_pinky  = sqrt(tip_dist_thumb_pinky);
+    std::cout << tip_dist_thumb_index  << ", "
+	      << tip_dist_thumb_middle << ", "
+	      << tip_dist_thumb_ring   << ", "
+	      << tip_dist_thumb_pinky
+	      << std::endl;
 
   }
 
