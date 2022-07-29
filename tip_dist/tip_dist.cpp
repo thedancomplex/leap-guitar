@@ -83,6 +83,9 @@ void SampleListener::onFrame(const Controller& controller) {
 
 */
     // Get fingers
+    double xyz_index[] = {0.0, 0.0, 0.0};
+    double xyz_thumb[] = {0.0, 0.0, 0.0};
+    double tip_dist = 0.0;
     const FingerList fingers = hand.fingers();
     for (FingerList::const_iterator fl = fingers.begin(); fl != fingers.end(); ++fl) {
       const Finger finger = *fl;
@@ -98,29 +101,39 @@ void SampleListener::onFrame(const Controller& controller) {
         Bone::Type boneType = static_cast<Bone::Type>(b);
         Bone bone = finger.bone(boneType);
 	if ( 
-	    /* Gets the middle finger */
-	    (boneNames[boneType].compare("Middle") == 0) 
-	    & 
+	    /* Gets the end of the finger */
+	    (boneNames[boneType].compare("Distal") == 0) 
+	   ) {
 
-	    /* Gets the end of finger */
-	    (finger.type() == 4)) {  
+            if (
+	    /* Gets the index finger */
+	    (fingerNames[finger.type()].compare("Index") == 0)
+	    ) {  
+            xyz_index[0] = bone.nextJoint()[0];
+            xyz_index[1] = bone.nextJoint()[1];
+            xyz_index[2] = bone.nextJoint()[2];
+	    }
 
-
-	std::cout << std::string(6, ' ') <<  boneNames[boneType]
-                  << " - "     << b                << " - "
-		  << " - "     << boneType         << " - "
-                  << ", end: " << bone.nextJoint()
-                  << ", end: " << finger.type()
-                  << std::endl;
-/*
-	std::cout << std::string(6, ' ') <<  boneNames[boneType]
-                  << " bone, start: " << bone.prevJoint()
-                  << ", end: " << bone.nextJoint()
-                  << ", direction: " << bone.direction() << std::endl;
-*/
+	    if (
+	    (fingerNames[finger.type()].compare("Thumb") == 0)
+	    ) {  
+            xyz_thumb[0] = bone.nextJoint()[0];
+            xyz_thumb[1] = bone.nextJoint()[1];
+            xyz_thumb[2] = bone.nextJoint()[2];
+	    }
 	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		tip_dist += (xyz_index[i] - xyz_thumb[i]) * (xyz_index[i] - xyz_thumb[i]);
+	}
+
+	tip_dist = sqrt(tip_dist);
+
       }
     }
+    std::cout << tip_dist << std::endl;
+
   }
 
 
