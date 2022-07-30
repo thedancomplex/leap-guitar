@@ -1,58 +1,43 @@
-// midiprobe.cpp
+// midiout.cpp
+#include <unistd.h>
 #include <iostream>
 #include <cstdlib>
 #include "RtMidi.h"
 int main()
 {
-  RtMidiIn  *midiin = 0;
-  RtMidiOut *midiout = 0;
-  // RtMidiIn constructor
-  try {
-    midiin = new RtMidiIn();
+  RtMidiOut *midiout = new RtMidiOut();
+  std::vector<unsigned char> message;
+  // Check available ports.
+  unsigned int nPorts = midiout->getPortCount();
+  if ( nPorts == 0 ) {
+    std::cout << "No ports available!\n";
+    goto cleanup;
   }
-  catch ( RtMidiError &error ) {
-    error.printMessage();
-    exit( EXIT_FAILURE );
-  }
-  // Check inputs.
-  unsigned int nPorts = midiin->getPortCount();
-  std::cout << "\nThere are " << nPorts << " MIDI input sources available.\n";
-  std::string portName;
-  for ( unsigned int i=0; i<nPorts; i++ ) {
-    try {
-      portName = midiin->getPortName(i);
-    }
-    catch ( RtMidiError &error ) {
-      error.printMessage();
-      goto cleanup;
-    }
-    std::cout << "  Input Port #" << i+1 << ": " << portName << '\n';
-  }
-  // RtMidiOut constructor
-  try {
-    midiout = new RtMidiOut();
-  }
-  catch ( RtMidiError &error ) {
-    error.printMessage();
-    exit( EXIT_FAILURE );
-  }
-  // Check outputs.
-  nPorts = midiout->getPortCount();
-  std::cout << "\nThere are " << nPorts << " MIDI output ports available.\n";
-  for ( unsigned int i=0; i<nPorts; i++ ) {
-    try {
-      portName = midiout->getPortName(i);
-    }
-    catch (RtMidiError &error) {
-      error.printMessage();
-      goto cleanup;
-    }
-    std::cout << "  Output Port #" << i+1 << ": " << portName << '\n';
-  }
-  std::cout << '\n';
+  // Open first available port.
+  midiout->openPort( 0 );
+  // Send out a series of MIDI messages.
+  // Program change: 192, 5
+  message.push_back( 192 );
+  message.push_back( 5 );
+  midiout->sendMessage( &message );
+  // Control Change: 176, 7, 100 (volume)
+  message[0] = 176;
+  message[1] = 7;
+  message.push_back( 100 );
+  midiout->sendMessage( &message );
+  // Note On: 144, 64, 90
+  message[0] = 144;
+  message[1] = 64;
+  message[2] = 90;
+  midiout->sendMessage( &message );
+  usleep( 500000 ); // Platform-dependent ... see example in tests directory.
+  // Note Off: 128, 64, 40
+  message[0] = 128;
+  message[1] = 64;
+  message[2] = 40;
+  midiout->sendMessage( &message );
   // Clean up
  cleanup:
-  delete midiin;
   delete midiout;
   return 0;
 }
