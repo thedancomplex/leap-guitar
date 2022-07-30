@@ -1,5 +1,5 @@
-#include "RtMidi.h"
-int main() {
+#include <RtMidi.h>
+int midi_init() {
   try {
     RtMidiIn midiin;
   } catch (RtMidiError &error) {
