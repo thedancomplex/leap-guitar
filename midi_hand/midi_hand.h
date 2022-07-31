@@ -10,7 +10,16 @@ int midi_cleanup();
 int midi_init();
 int midi_send();
 
-int midi_init()
+//class MidiSender : public MidiSend {
+class MidiSender {
+  public:
+    virtual int midi_init(void);
+    virtual int midi_send(void);
+    virtual int midi_cleanup(void);
+  private:
+};
+
+int MidiSender::midi_init()
 {
   RtMidiOut *midiout = new RtMidiOut();
   // Check available ports.
@@ -22,9 +31,9 @@ int midi_init()
   // Open first available port.
   midiout->openPort( 0 );
   return 0;
- }
+}
 
-int midi_send()
+int MidiSender::midi_send()
 {
   std::vector<unsigned char> message;
   // Send out a series of MIDI messages.
@@ -52,8 +61,8 @@ int midi_send()
   return 0;
 }
 
-int midi_cleanup()
+int MidiSender::midi_cleanup()
 {
-	delete midiout;
-	return 0;
+  delete midiout;
+  return 0;
 }

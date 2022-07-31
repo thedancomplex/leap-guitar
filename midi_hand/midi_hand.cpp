@@ -19,6 +19,7 @@ class SampleListener : public Listener {
     virtual void onServiceDisconnect(const Controller&);
 
   private:
+    MidiSender ms;
 };
 
 const std::string fingerNames[] = {"Thumb", "Index", "Middle", "Ring", "Pinky"};
@@ -31,11 +32,11 @@ void SampleListener::onInit(const Controller& controller) {
 
 void SampleListener::onConnect(const Controller& controller) {
   std::cout << "Connected" << std::endl;
-  midi_init();
   controller.enableGesture(Gesture::TYPE_CIRCLE);
   controller.enableGesture(Gesture::TYPE_KEY_TAP);
   controller.enableGesture(Gesture::TYPE_SCREEN_TAP);
   controller.enableGesture(Gesture::TYPE_SWIPE);
+  ms.midi_init();
 }
 
 void SampleListener::onDisconnect(const Controller& controller) {
@@ -80,7 +81,7 @@ void SampleListener::onFrame(const Controller& controller) {
               << "yaw: "    << direction.yaw()   * RAD_TO_DEG << " degrees" 
 	      << std::endl;
     }
-  midi_send();
+//  ms.midi_send();
   }
 
 void SampleListener::onFocusGained(const Controller& controller) {
