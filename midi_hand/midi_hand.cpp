@@ -1,7 +1,12 @@
 #include <iostream>
 #include <cstring>
 #include "Leap.h"
-#include "midi_hand.h"
+//#include "midi_hand.h"
+
+
+int midi_send();
+int midi_init();
+int midi_cleanup();
 
 using namespace Leap;
 
@@ -27,6 +32,7 @@ const std::string stateNames[] = {"STATE_INVALID", "STATE_START", "STATE_UPDATE"
 
 void SampleListener::onInit(const Controller& controller) {
   std::cout << "Initialized" << std::endl;
+  midi_init();
 }
 
 void SampleListener::onConnect(const Controller& controller) {
@@ -35,7 +41,7 @@ void SampleListener::onConnect(const Controller& controller) {
   controller.enableGesture(Gesture::TYPE_KEY_TAP);
   controller.enableGesture(Gesture::TYPE_SCREEN_TAP);
   controller.enableGesture(Gesture::TYPE_SWIPE);
-  midi_init();
+  //midi_init();
   std::cout << "done midi init" << std::endl;
 }
 
@@ -128,5 +134,58 @@ int main(int argc, char** argv) {
   // Remove the sample listener when done
   controller.removeListener(listener);
 
+  return 0;
+}
+// midiout.cpp
+#include <unistd.h>
+#include <iostream>
+#include <cstdlib>
+#include "RtMidi.h"
+RtMidiOut *midiout = new RtMidiOut();
+
+int midi_init()
+{
+  // Check available ports.
+  unsigned int nPorts = midiout->getPortCount();
+  if ( nPorts == 0 ) {
+    std::cout << "No ports available!\n";
+    midi_cleanup();
+  }
+  // Open first available port.
+  midiout->openPort( 0 );
+  return 0;
+}
+
+int midi_send()
+{
+  std::vector<unsigned char> message;
+  // Send out a series of MIDI messages.
+  // Program change: 192, 5
+  message.push_back( 192 );
+  message.push_back( 5 );
+  midiout->sendMessage( &message );
+  // Control Change: 176, 7, 100 (volume)
+  message[0] = 176;
+  message[1] = 7;
+  message.push_back( 100 );
+  midiout->sendMessage( &message );
+  // Note On: 144, 64, 90
+  message[0] = 144;
+  message[1] = 64;
+  message[2] = 90;
+  midiout->sendMessage( &message );
+  usleep( 500000 ); // Platform-dependent ... see example in tests directory.
+  // Note Off: 128, 64, 40
+  message[0] = 128;
+  message[1] = 64;
+  message[2] = 40;
+  midiout->sendMessage( &message );
+  // Clean up
+  return 0;
+}
+
+int midi_cleanup()
+{
+  delete midiout;
   return 0;
 }
