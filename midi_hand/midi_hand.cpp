@@ -7,6 +7,9 @@
 int midi_send();
 int midi_init();
 int midi_cleanup();
+int midi_volume(double val);
+int midi_note_cont(double val);
+int midi_pitch_bend(double val);
 
 using namespace Leap;
 
@@ -55,6 +58,8 @@ void SampleListener::onExit(const Controller& controller) {
 }
 
 void SampleListener::onFrame(const Controller& controller) {
+
+  double deg = 0.0;
   // Get the most recent frame and report some basic information
   const Frame frame = controller.frame();
   std::cout << "Frame id: " << frame.id()
@@ -79,6 +84,7 @@ void SampleListener::onFrame(const Controller& controller) {
     // Get the hand's normal vector and direction
     const Vector normal = hand.palmNormal();
     const Vector direction = hand.direction();
+    deg = direction.pitch() * RAD_TO_DEG;
 
     // Calculate the hand's pitch, roll, and yaw angles
     std::cout << std::string(2, ' ') 
@@ -87,7 +93,8 @@ void SampleListener::onFrame(const Controller& controller) {
               << "yaw: "    << direction.yaw()   * RAD_TO_DEG << " degrees" 
 	      << std::endl;
     }
-  midi_send();
+  double val = deg / 180.0;
+  midi_pitch_bend(val*2);
   }
 
 void SampleListener::onFocusGained(const Controller& controller) {
@@ -153,6 +160,73 @@ int midi_init()
   }
   // Open first available port.
   midiout->openPort( 0 );
+  return 0;
+}
+
+int midi_note_cont(double val)
+{
+  std::vector<unsigned char> message;
+  // Send out a series of MIDI messages.
+  if( val < 0.0 ) val = 0.0;
+  else if( val > 1.0 ) val = 1.0;
+  int vali =(int)(val * 127.0);
+  if( vali < 0 ) vali = 0;
+  else if( vali > 127 ) vali = 127;
+  message.push_back(0x90);
+  message.push_back(vali);
+  message.push_back( 100 );
+  midiout->sendMessage( &message );
+  message.push_back(0x80);
+  message.push_back(vali);
+  message.push_back( 100 );
+  midiout->sendMessage( &message );
+  return 0;
+}
+
+#define MIDI_PITCH_BEND_MAX 16384
+#define MIDI_PITCH_BEND_MIN 0
+#define MIDI_PITCH_BEND_CENTER 8192
+
+int midi_pitch_bend(double val)
+{
+  std::vector<unsigned char> message;
+  // Send out a series of MIDI messages.
+  double val2 = val;
+  if( val < -1.0 ) val = -1.0;
+  else if( val > 1.0 ) val = 1.0;
+  val = (val + 1.0) / 2.0;
+
+  int vali =(int)(val * MIDI_PITCH_BEND_MAX);
+  if( vali < MIDI_PITCH_BEND_MIN ) vali = MIDI_PITCH_BEND_MIN;
+  else if( vali > MIDI_PITCH_BEND_MAX ) vali = MIDI_PITCH_BEND_MAX;
+
+  int mLSB = vali & 0x7F;
+  int mMSB = (vali >> 7) & 0x7F;
+  int vali2 = 128*mMSB + mLSB;
+
+  std::cout << val2 << " - " << vali << " - " << vali2 << " -- " << mLSB << " " << mMSB << std::endl;
+
+  message.push_back(0xE0);
+  message.push_back(mLSB);
+  message.push_back(mMSB );
+  midiout->sendMessage( &message );
+  return 0;
+}
+
+int midi_volume(double val)
+{
+  std::vector<unsigned char> message;
+  // Send out a series of MIDI messages.
+  // Control Change: 176, 7, 100 (volume)
+  if( val < 0.0 ) val = 0.0;
+  else if( val > 1.0 ) val = 1.0;
+  int vali =(int)(val * 100.0);
+  if( vali < 0 ) vali = 0;
+  else if( vali > 100 ) vali = 100;
+  message.push_back(176);
+  message.push_back(1);
+  message.push_back( vali );
+  midiout->sendMessage( &message );
   return 0;
 }
 
