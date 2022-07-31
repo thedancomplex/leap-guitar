@@ -4,11 +4,14 @@
 #include <cstdlib>
 #include "RtMidi.h"
 
-RtMidiOut *midiout;
-
+/*
 int midi_cleanup();
 int midi_init();
 int midi_send();
+*/
+
+
+
 
 //class MidiSender : public MidiSend {
 class MidiSender {
@@ -17,19 +20,25 @@ class MidiSender {
     virtual int midi_send(void);
     virtual int midi_cleanup(void);
   private:
+    RtMidiOut *midiout;
 };
 
 int MidiSender::midi_init()
 {
-  RtMidiOut *midiout = new RtMidiOut();
+  //RtMidiOut *midiout = new RtMidiOut();
   // Check available ports.
-  unsigned int nPorts = midiout->getPortCount();
+  std::cout << "start midi init" << std::endl;
+  unsigned int nPorts = this->midiout->getPortCount();
+  std::cout << "start midi init part 1" << std::endl;
   if ( nPorts == 0 ) {
     std::cout << "No ports available!\n";
     midi_cleanup();
   }
+  std::cout << "start midi init part 2" << std::endl;
   // Open first available port.
-  midiout->openPort( 0 );
+  this->midiout->openPort( 0 );
+  std::cout << "Opened Midi port 0 - "
+  << std::endl;
   return 0;
 }
 
@@ -40,7 +49,8 @@ int MidiSender::midi_send()
   // Program change: 192, 5
   message.push_back( 192 );
   message.push_back( 5 );
-  midiout->sendMessage( &message );
+  this->midiout->sendMessage( &message );
+  /*
   // Control Change: 176, 7, 100 (volume)
   message[0] = 176;
   message[1] = 7;
@@ -58,11 +68,12 @@ int MidiSender::midi_send()
   message[1] = 64;
   message[2] = 40;
   midiout->sendMessage( &message );
+  */
   return 0;
 }
 
 int MidiSender::midi_cleanup()
 {
-  delete midiout;
+  delete this->midiout;
   return 0;
 }

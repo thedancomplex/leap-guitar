@@ -37,6 +37,7 @@ void SampleListener::onConnect(const Controller& controller) {
   controller.enableGesture(Gesture::TYPE_SCREEN_TAP);
   controller.enableGesture(Gesture::TYPE_SWIPE);
   ms.midi_init();
+  std::cout << "done midi init" << std::endl;
 }
 
 void SampleListener::onDisconnect(const Controller& controller) {
@@ -81,7 +82,7 @@ void SampleListener::onFrame(const Controller& controller) {
               << "yaw: "    << direction.yaw()   * RAD_TO_DEG << " degrees" 
 	      << std::endl;
     }
-//  ms.midi_send();
+  ms.midi_send();
   }
 
 void SampleListener::onFocusGained(const Controller& controller) {
