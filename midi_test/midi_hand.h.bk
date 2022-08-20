@@ -1,0 +1,11 @@
+#include <RtMidi.h>
+int midi_init() {
+  try {
+    RtMidiIn midiin;
+  } catch (RtMidiError &error) {
+    // Handle the exception here
+    error.printMessage();
+  }
+  return 0;
+}
+
