@@ -15,7 +15,7 @@ else
 endif
 
 $(SYS_NAME): $(SYS_NAME).cpp
-	$(CXX) -Wall -g -I../include $(SYS_NAME).cpp -o $(SYS_NAME) $(LEAP_LIBRARY)
+	$(CXX) -Wall -g -I../include -Iinclude/  $(SYS_NAME).cpp -o $(SYS_NAME) $(LEAP_LIBRARY) -lstk -lpthread -ljack -lrt
 ifeq ($(OS), Darwin)
 	install_name_tool -change @loader_path/libLeap.dylib ../lib/libLeap.dylib Sample
 endif

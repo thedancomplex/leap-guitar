@@ -2,6 +2,12 @@
 #include <cstring>
 #include "Leap.h"
 
+#include <stk/SineWave.h>
+#include <stk/RtWvOut.h>
+#include <cstdlib>
+
+
+using namespace stk;
 using namespace Leap;
 
 class SampleListener : public Listener {
